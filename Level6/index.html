@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>NodeJS</title>
+</head>
+<body>
+	
+	<h1>Hello World!</h1>
+	
+	<div id="messages"></div>
+	
+	<form id="chat_form">
+	<input id="chat_input" type="text"/>
+	<input type="submit" value="Send"/>
+	</form>
+	
+	<script src='/socket.io/socket.io.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	
+	<script>
+		var socket = io.connect('http://localhost:8080');
+		
+		var insertMessage = function(data){
+			$('#messages').append(data);
+			$('#messages').append('<br/>');
+		};
+		
+		socket.on('connect', function(data){
+			$('#messages').html('Connected to chattr');
+			nickname = prompt('What is your nickname?');
+			socket.emit('join', nickname);
+		});
+		
+		socket.on('messages',function(data){
+			insertMessage(data);
+		});
+		
+		$('#chat_form').submit(function(e){
+			var message = $('#chat_input').val();
+			socket.emit('messages', message);
+			$('#chat_input').val('');
+			return false;
+		});
+	</script>
+	
+</body>
+</html>
